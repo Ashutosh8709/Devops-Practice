@@ -1,0 +1,53 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: demo-app
+  namespace: devops-demo
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-app
+
+  template:
+    metadata:
+      labels:
+        app: demo-app
+
+    spec:
+      containers:
+        - name: demo-app
+          image: ashutosh8709/devops-demo:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5100
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5100
+
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: 5100
+
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
