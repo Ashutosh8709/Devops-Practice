@@ -1,0 +1,124 @@
+@Library("Shared") _
+pipeline {
+    agent {label "agent-1"}
+
+    environment{
+      SONAR_HOME = tool "Sonar"
+    }
+
+    parameters{
+        string(name: 'APP_DOCKER_TAG',defaultValue: '', description: 'Setting docker image for latest push')
+    }
+
+    stages{
+      stage("Validate Parameters"){
+        steps{
+          script{
+            if(params.APP_DOCKER_TAG == ''){
+                error("APP_DOCKER_TAG must be provided.")
+            }
+          }
+        }
+      }
+
+      stage("Workspace cleanup"){
+          steps{
+              script{
+                  cleanWs()
+              }
+          }
+      }
+
+      stage("Git: Code Clonning"){
+          steps{
+              script{
+                  clone("https://github.com/Ashutosh8709/Devops-Practice.git","main")
+              }
+          }
+      }
+
+      stage("Trivy: Filesystem scan"){
+          steps{
+              script{
+                  trivy_scan()
+              }
+          }
+      }
+
+      stage("OWASP: Dependency check"){
+            steps{
+                script{
+                    owasp_dependency()
+                }
+            }
+      }
+
+
+      stage("SonarQube: Code Analysis"){
+            steps{
+                script{
+                    sonarqube_analysis("Sonar","devops-demo","devops-demo")
+                }
+            }
+      }
+
+      stage("SonarQube: Code Quality Gates"){
+            steps{
+                script{
+                    sonarqube_code_quality()
+                }
+            }
+      }
+
+
+      stage("Build"){
+            steps{
+                echo "This is building the code"
+                script{
+                    docker_build("docker-demo","${params.APP_DOCKER_TAG}","docker-demo")
+                    
+                }
+            }
+      }
+      stage("Push to DockerHub"){
+            steps{
+                echo "This is pushing the image to Docker Hub"
+                script{
+                    docker_push()
+                }
+            }
+      }
+      stage("Update Helm values.yaml") {
+        steps {
+            script {
+                sh """
+                  sed -i 's/^\\s*tag:.*/  tag: ${params.APP_DOCKER_TAG}/' k8s/devops-demo/values.yaml
+                """
+            }
+        }
+      }
+
+      stage("Git: Commit & Push Helm Update") {
+        steps {
+            withCredentials([gitUsernamePassword(
+                credentialsId: 'Github-cred', gitToolName: 'Default'
+            )]) {
+                sh """
+                  echo "Checking repository status: "
+                  git status
+
+                  echo "Adding changes to git: "
+                  git add k8s/devops-demo/values.yaml
+
+                  echo "Commiting changes: "
+                  git commit -m "Updated Tags in values.yaml"
+
+                  echo "Pushing changes to github: "
+                  git push https://github.com/Ashutosh8709/Devops-Practice.git main
+                """
+              }
+            }
+      }
+
+    }
+  }
