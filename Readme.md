@@ -152,6 +152,7 @@ Designed for:
 # 🔄 CI Pipeline (Jenkins)
 
 ![Jenkins Pipeline](docs/jenkins1.png)
+![Jenkins Pipeline](docs/jenkins2.png)
 
 Jenkins performs **build‑time responsibility only**.
 
