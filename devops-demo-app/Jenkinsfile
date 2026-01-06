@@ -107,17 +107,20 @@ pipeline {
                 credentialsId: 'Github-cred', gitToolName: 'Default'
             )]) {
                 sh """
-                  echo "Checking repository status: "
-                  git status
+                  git config user.name "jenkins-bot"
+              git config user.email "ci@jenkins.local"
 
-                  echo "Adding changes to git: "
-                  git add k8s/devops-demo/values.yaml
+              echo "Checking repository status:"
+              git status
 
-                  echo "Commiting changes: "
-                  git commit -m "Updated Tags in values.yaml"
+              echo "Adding changes to git:"
+              git add k8s/devops-demo/values.yaml
 
-                  echo "Pushing changes to github: "
-                  git push https://github.com/Ashutosh8709/Devops-Practice.git main
+              echo "Committing changes:"
+              git commit -m "ci: update image tag to ${params.APP_DOCKER_TAG}"
+
+              echo "Pushing changes to GitHub:"
+              git push origin main
                 """
               }
             }
