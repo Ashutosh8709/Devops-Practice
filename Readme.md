@@ -109,22 +109,20 @@ Suggested diagram layers:
 ├── app/
 │   ├── app.js
 │   ├── package.json
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── Jenkinsfile
 │
 ├── k8s/
 │   ├── devops-demo/        # Helm chart
-│   │   ├── Chart.yaml
-│   │   ├── values.yaml
-│   │   └── templates/
-│   │       ├── deployment.yaml
-│   │       ├── service.yaml
-│   │       └── ingress.yaml
-│   │
-│   └── monitoring/
-│       ├── servicemonitor.yaml
-│       └── devops-demo-alerts.yaml
+│      ├── Chart.yaml
+│      ├── values.yaml
+│      └── templates/
+│          ├── deployment.yaml
+│          ├── service.yaml
+│          └── ingress.yaml
 │
-├── jenkins/Jenkinsfile
+│
+├── argocd-app.yml
 └── README.md
 ```
 
@@ -153,6 +151,8 @@ Designed for:
 
 # 🔄 CI Pipeline (Jenkins)
 
+![Jenkins Pipeline](docs/jenkins1.png)
+
 Jenkins performs **build‑time responsibility only**.
 
 ### Pipeline stages:
@@ -177,6 +177,8 @@ It only updates Git.
 ---
 
 # 🔁 GitOps CD Flow (Argo CD + Helm)
+
+![Argo CD Dashboard](docs/argo-cd.png)
 
 Argo CD continuously monitors:
 
@@ -232,6 +234,8 @@ Provides:
 ---
 
 # 📊 Observability Stack
+
+![Grafana Dashboard](docs/grafana.png)
 
 ## Prometheus
 
@@ -388,7 +392,6 @@ In real environments this system would include:
 # 👨‍💻 Author
 
 Ashutosh Kumar
-DevOps / Cloud / Platform Engineering
 
 ---
 
